@@ -15,7 +15,7 @@ public:
         yaw(-90.0f),
         pitch(0.0f),
         speed(0.1f),
-        sensitivity(0.05f),
+        sensitivity(0.025f),
         fov(45),
         aspectRatio(aspectRatio),
         nearPlane(0.1f),
@@ -46,7 +46,11 @@ public:
             position -= right * velocity;
         if (key == sf::Keyboard::D)
             position += right * velocity;
-    }
+        if (key == sf::Keyboard::LControl)
+            position -= worldUp * velocity;
+        if (key == sf::Keyboard::LShift || key == sf::Keyboard::Space)
+            position += worldUp * velocity;
+    }   
 
     void processMouseMovement(GLfloat xoffset, GLfloat yoffset) {
         xoffset *= sensitivity;
@@ -61,10 +65,8 @@ public:
             pitch = -89.0f;
         updateCameraVectors();
     }
-    glm::vec3 position;
-
+    glm::vec3 position, front, up, right, worldUp;
 private:
-    glm::vec3 front, up, right, worldUp;
     GLfloat yaw, pitch, speed, sensitivity, aspectRatio, fov, nearPlane, farPlane;
 
     void updateCameraVectors() {

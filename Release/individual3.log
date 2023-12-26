@@ -1,0 +1,6 @@
+﻿  ImGuiFileDialog.cpp
+  main.cpp
+C:\.Projects\individual3\lib\ImGuiFileDialog\ImGuiFileDialog.h(1271,10): error C1083: Не удается открыть файл включение: imgui.h: No such file or directory,
+  (компиляция исходного файла "lib/ImGuiFileDialog/ImGuiFileDialog.cpp")
+  
+C:\.Projects\individual3\main.cpp(3,10): error C1083: Не удается открыть файл включение: GL/glew.h: No such file or directory,

@@ -49,16 +49,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\shader1.frag">
+    <None Include="shaders\shader.frag">
       <Filter>Файлы ресурсов</Filter>
     </None>
     <None Include="shaders\shader.vert">
       <Filter>Файлы ресурсов</Filter>
     </None>
-    <None Include="shaders\shader3.frag">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
-    <None Include="shaders\shader2.frag">
+    <None Include="shaders\instanced_shader.vert">
       <Filter>Файлы ресурсов</Filter>
     </None>
   </ItemGroup>

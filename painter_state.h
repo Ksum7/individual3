@@ -12,15 +12,14 @@ public:
 	Camera camera;
 
 	Model* platform = nullptr;
-	Model* lizardMk = nullptr;
-	Model* warrior = nullptr;
-	Model* gun = nullptr;
-	Model* table = nullptr;
-	Model* coffee = nullptr;
+	Model* airship = nullptr;
+	Model* gift = nullptr;
+	Model* house = nullptr;
+	Model* tree = nullptr;
+	Model* balloon = nullptr;
+	Model* cloud = nullptr;
 
-	Model* test = nullptr;
-
-	PointSource pointSource = PointSource(1.0f, glm::vec3(0,0,0));
+	PointSource pointSource = PointSource(0.0f, glm::vec3(0,0,0));
 	DirectionalSource directionalSource = DirectionalSource(1.0f, glm::vec3(0, 100, 100));
 	SpotlightSource spotlightSource = SpotlightSource(0.0f, glm::vec3(0, 5, 0), glm::vec3(0, 0, 0), 30.0f);
 };

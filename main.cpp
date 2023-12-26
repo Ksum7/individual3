@@ -81,23 +81,46 @@ std::string vec3ToStr(glm::vec3 vec3) {
 }
 
 int main() {
-	sf::RenderWindow window(sf::VideoMode(600, 600), "Lab 14", sf::Style::Default, sf::ContextSettings(24));
+	std::srand(std::time(0));
+	sf::RenderWindow window(sf::VideoMode(600, 600), "Individual 3", sf::Style::Default, sf::ContextSettings(24));
 	window.setFramerateLimit(60);
 	window.setVerticalSyncEnabled(true);
 	window.setActive(true);
 	std::filesystem::path currentPath = std::filesystem::current_path();
 
-	Camera camera = Camera(glm::vec3(0.0f, 2.0f, 8.0f), 1.0f);
+	Camera camera = Camera(glm::vec3(0.0f, 5.0f, 20.0f), 1.0f);
 	auto state = PainterState(camera);
 	auto painter = Painter(state);
+	std::vector<glm::vec3> platformTranslations;
+	for (int i = -50; i < 50; ++i) {
+		for (int j = -50; j < 50; ++j) {
+			platformTranslations.push_back(glm::vec3(i * 10.0f, 0.0f, j * 10.0f));
+		}
+	}
+
+	std::vector<glm::vec3> houseTranslations;
+	for (int i = 0; i < 5; ++i) {
+		float randomX = static_cast<float>(std::rand()) / RAND_MAX * 80.0f - 40.0f;
+		float randomZ = static_cast<float>(std::rand()) / RAND_MAX * 80.0f - 40.0f;
+		houseTranslations.push_back(glm::vec3(randomX, 0.0f, randomZ));
+	}
+
+	std::vector<glm::vec3> cloudTranslations;
+	for (int i = 0; i < 10; ++i) {
+		float randomX = static_cast<float>(std::rand()) / RAND_MAX * 80.0f - 40.0f;
+		float randomY = static_cast<float>(std::rand()) / RAND_MAX * 5.0f;
+		float randomZ = static_cast<float>(std::rand()) / RAND_MAX * 80.0f - 40.0f;
+		cloudTranslations.push_back(glm::vec3(randomX, 5.0f + randomY, randomZ));
+	}
 
 	painter.Init();
-	painter.state.platform = new Model(currentPath.string() + "\\platform\\scene.gltf");
-	painter.state.warrior = new Model(currentPath.string() + "\\kazak\\scene.gltf");
-	painter.state.lizardMk = new Model(currentPath.string() + "\\lizard_detailed\\reptile.obj");
-	painter.state.gun = new Model(currentPath.string() + "\\gun\\Gun.obj");
-	painter.state.table = new Model(currentPath.string() + "\\table\\scene.gltf");
-	painter.state.coffee = new Model(currentPath.string() + "\\coffee\\scene.gltf");
+	painter.state.platform = new Model(currentPath.string() + "\\platform\\scene.gltf", platformTranslations.data(), platformTranslations.size());
+	painter.state.airship = new Model(currentPath.string() + "\\airship\\airship.obj");
+	painter.state.tree = new Model(currentPath.string() + "\\tree\\tree.obj");
+	painter.state.gift = new Model(currentPath.string() + "\\coffee\\scene.gltf");
+	painter.state.house = new Model(currentPath.string() + "\\house\\house.obj", houseTranslations.data(), houseTranslations.size());
+	painter.state.balloon = new Model(currentPath.string() + "\\coffee\\scene.gltf");
+	painter.state.cloud = new Model(currentPath.string() + "\\coffee\\scene.gltf", cloudTranslations.data(), cloudTranslations.size());
 
 	// delete some excess meshes
 	/*painter.state.warrior->meshes.erase(painter.state.warrior->meshes.begin());
@@ -166,31 +189,22 @@ int main() {
 			}
 		}
 
-		ImGui::SFML::Update(window, deltaClock.restart());
+		//ImGui::SFML::Update(window, deltaClock.restart());
 
 
-		ImGui::Begin("Lab 14");
+		//ImGui::Begin("Individual 3");
 
-		ImGui::Text("Camera position:");
-		ImGui::Text(vec3ToStr(painter.state.camera.position).c_str());
+		//ImGui::Text("Camera position:");
+		//ImGui::Text(vec3ToStr(painter.state.camera.position).c_str());
 
-		pointSourceEditor(&painter.state.pointSource.intensity, &painter.state.pointSource.pos);
-		directionalSourceEditor(&painter.state.directionalSource.intensity, &painter.state.directionalSource.direction);
-		spotlightSourceEditor(&painter.state.spotlightSource.intensity, &painter.state.spotlightSource.pos, &painter.state.spotlightSource.viewPoint, &painter.state.spotlightSource.cone);
-
-		shadingPicker("Warrior", &painter.state.warrior->shading);
-		shadingPicker("Lizard", &painter.state.lizardMk->shading);
-		shadingPicker("Gun", &painter.state.gun->shading);
-		shadingPicker("Coffee", &painter.state.coffee->shading);
-		shadingPicker("Table", &painter.state.table->shading);
-		shadingPicker("Platform", &painter.state.platform->shading);
+		//directionalSourceEditor(&painter.state.directionalSource.intensity, &painter.state.directionalSource.direction);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		painter.Draw();
 
-		ImGui::End();
-		ImGui::SFML::Render(window);
+		//ImGui::End();
+		//ImGui::SFML::Render(window);
 		window.display();
 	}
 

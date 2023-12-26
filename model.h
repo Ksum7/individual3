@@ -107,18 +107,33 @@ class Mesh {
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ObjVertex), (GLvoid*)offsetof(ObjVertex, normal));
 		glEnableVertexAttribArray(3);
 
+		if (this->trLength > 0) {
+			GLuint instanceVBO;
+			glGenBuffers(1, &instanceVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * trLength, &translations[0], GL_STATIC_DRAW);
+			glEnableVertexAttribArray(4);
+			glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+			glVertexAttribDivisor(4, 1);
+		}
+
 		glBindVertexArray(0);
 	}
 
 	GLfloat deegressToRadians(GLfloat deegres) {
 		return deegres * 3.141592f / 180.0f;
 	}
-
+	glm::vec3* translations;
+	GLuint trLength;
 public:
 	GLuint VAO;
 	Material material;
 
-	Mesh(aiMesh* mesh, aiMaterial*  material, const std::string& modelDirectory) {
+	Mesh(aiMesh* mesh, aiMaterial*  material, const std::string& modelDirectory, glm::vec3* translations, GLuint trLength) {
+		this->translations = translations;
+		this->trLength = trLength;
+
 		aiColor3D ambient(0.10f, 0.10f, 0.10f);
 		material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
 		aiColor3D diffuse(0.8f, 0.8f, 0.8f);
@@ -129,12 +144,6 @@ public:
 		material->Get(AI_MATKEY_COLOR_EMISSIVE, emission);
 		GLfloat shininess = 16.f;
 		material->Get(AI_MATKEY_SHININESS, shininess);
-		std::cout << "=-------------------------------------------------------" << std::endl;
-		std::cout << "ambient " << ambient.r << ambient.g << ambient.b << std::endl;
-		std::cout << "diffuse " << diffuse.r << diffuse.g << diffuse.b << std::endl;
-		std::cout << "specular " << specular.r << specular.g << specular.b << std::endl;
-		std::cout << "emission " << emission.r << emission.g << emission.b << std::endl;
-		std::cout << "shininess " << shininess << std::endl;
 		Material mat(ambient, diffuse, specular, emission, shininess);
 		this->material = mat;
 
@@ -153,11 +162,16 @@ public:
 		material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
 
 		for (GLuint i = 0; i < mesh->mNumVertices; ++i) {
+			aiVector3D tex = aiVector3D(0,0,0);
+			if (mesh->mTextureCoords[0] != nullptr)
+			{
+				tex = mesh->mTextureCoords[0][i];
+			}
 
 			ObjVertex vertex(
 				mesh->mVertices[i],
 				color,
-				mesh->mTextureCoords[0][i],
+				tex,
 				mesh->mNormals[i]
 			);
 			vertices.push_back(vertex);
@@ -212,7 +226,12 @@ public:
 		glUniform1f(glGetUniformLocation(shaderId, "dSource.intensity"), dSource.intensity);
 		glUniform3fv(glGetUniformLocation(shaderId, "dSource.direction"), 1, glm::value_ptr(dSource.direction));
 
-		glDrawElements(GL_TRIANGLES, static_cast<GLuint>(indices.size()), GL_UNSIGNED_INT, 0);
+		if (trLength > 0) {
+			glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLuint>(indices.size()), GL_UNSIGNED_INT, 0, trLength);
+		}
+		else {
+			glDrawElements(GL_TRIANGLES, static_cast<GLuint>(indices.size()), GL_UNSIGNED_INT, 0);
+		}
 
 		glBindVertexArray(0);
 		glActiveTexture(GL_TEXTURE0);
@@ -230,7 +249,7 @@ class Model {
 public:
 	int shading = (int)Shading::Phong;
 	std::vector<Mesh> meshes;
-	Model(const std::string& path) {
+	Model(const std::string& path, glm::vec3* translations = nullptr, GLuint trLength = 0) {
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -243,7 +262,7 @@ public:
 		modelDirectory = modelDirectory.substr(0, modelDirectory.find_last_of('\\'));
 
 		for (GLuint i = 0; i < scene->mNumMeshes; ++i) {
-			Mesh mesh(scene->mMeshes[i], scene->mMaterials[scene->mMeshes[i]->mMaterialIndex], modelDirectory);
+			Mesh mesh(scene->mMeshes[i], scene->mMaterials[scene->mMeshes[i]->mMaterialIndex], modelDirectory, translations, trLength);
 			meshes.push_back(mesh);
 		}
 	}
