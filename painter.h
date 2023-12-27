@@ -171,17 +171,13 @@ class Painter {
 		return deegres * 3.141592f / 180.0f;
 	}
 
-	glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), yAngle, glm::vec3(1.0f, 0.5f, 0.0f));
 
 public:
 	Painter(PainterState& painterState) : state(painterState) {}
 
 	PainterState state;
 
-	GLuint sateliteNum = 10;
-	GLfloat yAngle = 0.0f;
-	GLfloat baseOrbitDeegre = 0.0f;
-	GLfloat orbitRadius = 5.0f;
+	glm::vec3 giftPos = glm::vec3(-1.0f);
 
 	void Draw() {
 		glEnable(GL_DEPTH_TEST);
@@ -232,6 +228,16 @@ public:
 			glm::mat4 cloudMat = glm::scale(glm::mat4(1.0f), glm::vec3(0.01f))
 				* glm::rotate(glm::mat4(1.0f), deegressToRadians(90), glm::vec3(-1.0f, 0.0f, 0.0f));
 			(state.cloud->Draw(instancedProgram, cloudMat, state.camera, state.pointSource, state.spotlightSource, state.directionalSource));
+			glUseProgram(0);
+		}
+
+		if (state.gift != nullptr && giftPos.y > 0.5f) {
+			glUseProgram(defaultProgram);
+			glm::mat4 giftMat = glm::translate(glm::mat4(1.0f), giftPos) 
+				* glm::scale(glm::mat4(1.0f), glm::vec3(0.01f))
+				* glm::rotate(glm::mat4(1.0f), deegressToRadians(90), glm::vec3(-1.0f, 0.0f, 0.0f));
+			(state.gift->Draw(defaultProgram, giftMat, state.camera, state.pointSource, state.spotlightSource, state.directionalSource));
+			giftPos.y -= 0.05;
 			glUseProgram(0);
 		}
 

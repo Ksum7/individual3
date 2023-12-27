@@ -161,6 +161,16 @@ int main() {
 				painter.state.camera.processResize(event.size.width, event.size.height);
 			}
 			else if (event.type == sf::Event::KeyPressed) {
+
+				if (event.key.code == sf::Keyboard::F && painter.giftPos.y <= 0.5f)
+				{
+					glm::vec3 fVec = glm::normalize(painter.state.camera.front);
+					fVec *= 3;
+					glm::vec3 uVec = glm::normalize(painter.state.camera.up);
+					uVec *= -0.5;
+
+					painter.giftPos = painter.state.camera.position + fVec + uVec;
+				}
 				painter.state.camera.processKeyboard(event.key.code);
 			}
 			else if (event.type == sf::Event::MouseMoved && isFocused) {
